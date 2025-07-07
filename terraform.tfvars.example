@@ -1,0 +1,25 @@
+# Copy this file to terraform.tfvars and fill in your values
+
+aws_region = "us-east-1"
+
+# Authentication endpoint to get bearer token
+auth_endpoint = "https://api.example.com/auth/token"
+
+# Actual API endpoint to call with bearer token
+api_endpoint = "https://api.example.com/data"
+
+# Secrets Manager configuration
+api_credentials_secret_name = "api-cron-app-credentials"
+splunk_credentials_secret_name = "api-cron-splunk-credentials"
+
+# Set to false if secrets already exist
+create_api_secret = true
+create_splunk_secret = true
+
+# Schedule (every 5 minutes)
+cron_schedule = "rate(5 minutes)"
+
+# Alternative cron expressions:
+# cron_schedule = "cron(0 */6 * * ? *)"  # Every 6 hours
+# cron_schedule = "cron(0 9 * * ? *)"    # Daily at 9 AM UTC
+# cron_schedule = "cron(0 0 * * ? *)"    # Daily at midnight UTC
