@@ -3,7 +3,9 @@ import os
 import boto3
 import urllib3
 import logging
-from datetime import datetime
+from datetime import datetime, timedelta
+from urllib.parse import urlencode
+from zoneinfo import ZoneInfo # Import ZoneInfo for timezone support
 
 # Configure logging
 logger = logging.getLogger()
@@ -136,7 +138,7 @@ def get_bearer_token(auth_endpoint, username, password, site, client_id):
             'error': str(e)
         }
 
-def call_api_with_token(api_endpoint, bearer_token):
+def call_api_with_token(url, bearer_token):
     """Call the API using bearer token"""
     try:
         headers = {
@@ -145,9 +147,9 @@ def call_api_with_token(api_endpoint, bearer_token):
             'Accept': 'application/json'
         }
         
-        logger.info(f"Calling API endpoint: {api_endpoint}")
+        logger.info(f"Calling API URL: {url}")
         
-        response = http.request('GET', api_endpoint, headers=headers)
+        response = http.request('GET', url, headers=headers)
         
         if response.status == 200:
             data = json.loads(response.data.decode('utf-8'))
@@ -235,7 +237,7 @@ def handler(event, context):
         
         logger.info(f"Starting cron job execution - Request ID: {context.aws_request_id}")
         logger.info(f"Auth endpoint: {auth_endpoint}")
-        logger.info(f"API endpoint: {api_endpoint}")
+        logger.info(f"Base API endpoint: {api_endpoint}")
         
         # Get credentials from both Secrets Manager secrets
         logger.info("Retrieving API credentials from Secrets Manager")
@@ -258,9 +260,44 @@ def handler(event, context):
             logger.error("Failed to obtain bearer token")
             raise Exception(f"Authentication failed: {token_result['error']}")
         
-        # Step 2: Call API with bearer token
-        logger.info("Step 2: Calling API with bearer token")
-        api_result = call_api_with_token(api_endpoint, token_result['token'])
+        # Step 2: Construct API URL with query parameters
+        logger.info("Step 2: Constructing API URL with query parameters")
+        
+        # Get current time in Australia/Sydney timezone
+        try:
+            sydney_tz = ZoneInfo("Australia/Sydney")
+            now_sydney = datetime.now(tz=sydney_tz)
+            logger.info(f"Current time in Australia/Sydney: {now_sydney.isoformat()}")
+        except Exception as e:
+            logger.error(f"Could not load timezone 'Australia/Sydney'. Defaulting to UTC. Error: {e}")
+            now_sydney = datetime.utcnow()
+
+        # Calculate starttime (Sydney time - 5 minutes)
+        start_time = now_sydney - timedelta(minutes=5)
+        formatted_start_time = start_time.strftime('%H:%M')
+        
+        # Get additional static params from env var
+        try:
+            additional_params = json.loads(os.environ.get('ADDITIONAL_QUERY_PARAMS', '{}'))
+        except json.JSONDecodeError:
+            logger.error("Invalid JSON in ADDITIONAL_QUERY_PARAMS environment variable. Using empty params.")
+            additional_params = {}
+
+        # Combine params, with starttime taking precedence if also in additional_params
+        query_params = {
+            **additional_params,
+            'starttime': formatted_start_time
+        }
+        
+        # Construct the full URL
+        encoded_params = urlencode(query_params)
+        full_api_url = f"{api_endpoint}?{encoded_params}"
+        
+        logger.info(f"Constructed API URL: {full_api_url}")
+
+        # Step 3: Call API with bearer token
+        logger.info("Step 3: Calling API with bearer token")
+        api_result = call_api_with_token(full_api_url, token_result['token'])
         
         # Combine results for logging and Splunk
         combined_result = {
@@ -270,6 +307,10 @@ def handler(event, context):
             'auth_success': token_result['success'],
             'auth_token_type': token_result.get('token_type'),
             'auth_expires_in': token_result.get('expires_in'),
+            'api_call_details': {
+                'url': full_api_url,
+                'params': query_params
+            },
             'api_call_result': api_result,
             'lambda_function': context.function_name,
             'lambda_version': context.function_version,
@@ -284,8 +325,8 @@ def handler(event, context):
         # Log to CloudWatch
         logger.info(f"Combined Result: {json.dumps(combined_result, default=str)}")
         
-        # Step 3: Send to Splunk
-        logger.info("Step 3: Sending data to Splunk")
+        # Step 4: Send to Splunk
+        logger.info("Step 4: Sending data to Splunk")
         splunk_success = send_to_splunk(splunk_credentials, combined_result)
         
         # Prepare response

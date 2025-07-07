@@ -47,6 +47,12 @@ variable "splunk_credentials_secret_name" {
   default     = "api-cron-splunk-credentials"
 }
 
+variable "additional_query_params" {
+  description = "A JSON string of additional static query parameters to add to the API call."
+  type        = string
+  default     = "{}"
+}
+
 variable "create_api_secret" {
   description = "Whether to create the API credentials secret in Secrets Manager"
   type        = bool
@@ -178,6 +184,7 @@ resource "aws_lambda_function" "api_cron_function" {
       API_ENDPOINT               = var.api_endpoint
       API_CREDENTIALS_SECRET_ARN = local.api_credentials_secret_arn
       SPLUNK_CREDENTIALS_SECRET_ARN = local.splunk_credentials_secret_arn
+      ADDITIONAL_QUERY_PARAMS       = var.additional_query_params
     }
   }
 
