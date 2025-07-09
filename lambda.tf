@@ -1,7 +1,7 @@
 # CloudWatch Log Group for the Lambda function
 resource "aws_cloudwatch_log_group" "api_cron_logs" {
-  name              = "/aws/lambda/api-cron-function"
-  retention_in_days = 14
+  name              = var.log_group_name
+  retention_in_days = 30
 }
 
 # Create a zip archive of the Lambda function code

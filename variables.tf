@@ -40,3 +40,10 @@ variable "create_api_secret" {
   type        = bool
   default     = true
 }
+
+# CloudWatch Logging Variables
+variable "log_group_name" {
+  description = "Name of the CloudWatch Log Group for the Lambda function"
+  type        = string
+  default     = "/aws/lambda/api-cron-function"
+}
