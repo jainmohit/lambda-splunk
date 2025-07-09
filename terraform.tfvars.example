@@ -2,27 +2,17 @@
 
 aws_region = "us-east-1"
 
+# The full ARN of your existing secret in AWS Secrets Manager
+api_credentials_secret_arn = "arn:aws:secretsmanager:us-east-1:123456789012:secret:your-api-secret-name-abcdef"
+
 # Authentication endpoint to get bearer token
 auth_endpoint = "https://api.example.com/auth/token"
 
 # Actual API endpoint to call with bearer token
 api_endpoint = "https://api.example.com/data"
 
-# Secrets Manager configuration
-api_credentials_secret_name = "api-cron-app-credentials"
-
-# Set to false if secrets already exist
-create_api_secret = true
-
 # Schedule (every 5 minutes)
 cron_schedule = "rate(5 minutes)"
 
-# Alternative cron expressions:
-# cron_schedule = "cron(0 */6 * * ? *)"  # Every 6 hours
-# cron_schedule = "cron(0 9 * * ? *)"    # Daily at 9 AM UTC
-# cron_schedule = "cron(0 0 * * ? *)"    # Daily at midnight UTC
-
 # A JSON string of additional static query parameters.
-# This example adds two parameters: `format` and `limit`.
-# The 'starttime' parameter is added automatically by the Lambda function.
 additional_query_params = "{\"format\":\"json\", \"limit\":100}"

@@ -14,6 +14,6 @@ output "eventbridge_rule_arn" {
 }
 
 output "api_credentials_secret_arn" {
-  description = "ARN of the AWS Secrets Manager secret for API credentials"
-  value       = local.api_credentials_secret_arn
+  description = "ARN of the AWS Secrets Manager secret for API credentials being used"
+  value       = var.api_credentials_secret_arn
 }

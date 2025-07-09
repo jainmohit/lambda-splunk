@@ -28,7 +28,7 @@ resource "aws_lambda_function" "api_cron_function" {
     variables = {
       AUTH_ENDPOINT                 = var.auth_endpoint
       API_ENDPOINT                  = var.api_endpoint
-      API_CREDENTIALS_SECRET_ARN    = local.api_credentials_secret_arn
+      API_CREDENTIALS_SECRET_ARN    = var.api_credentials_secret_arn
       ADDITIONAL_QUERY_PARAMS       = var.additional_query_params
     }
   }

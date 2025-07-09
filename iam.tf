@@ -39,7 +39,7 @@ resource "aws_iam_policy" "lambda_policy" {
           "secretsmanager:GetSecretValue"
         ]
         Resource = [
-          local.api_credentials_secret_arn
+          var.api_credentials_secret_arn
         ]
       }
     ]

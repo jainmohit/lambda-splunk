@@ -29,16 +29,9 @@ variable "additional_query_params" {
 }
 
 # AWS Secrets Manager Variables
-variable "api_credentials_secret_name" {
-  description = "Name of the AWS Secrets Manager secret containing API credentials"
+variable "api_credentials_secret_arn" {
+  description = "The full ARN of the existing AWS Secrets Manager secret containing API credentials."
   type        = string
-  default     = "api-cron-app-credentials"
-}
-
-variable "create_api_secret" {
-  description = "Set to true to create the API credentials secret in Secrets Manager. Set to false if it already exists."
-  type        = bool
-  default     = true
 }
 
 # CloudWatch Logging Variables
