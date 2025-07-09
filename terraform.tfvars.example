@@ -10,11 +10,9 @@ api_endpoint = "https://api.example.com/data"
 
 # Secrets Manager configuration
 api_credentials_secret_name = "api-cron-app-credentials"
-splunk_credentials_secret_name = "api-cron-splunk-credentials"
 
 # Set to false if secrets already exist
 create_api_secret = true
-create_splunk_secret = true
 
 # Schedule (every 5 minutes)
 cron_schedule = "rate(5 minutes)"

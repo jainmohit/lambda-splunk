@@ -35,20 +35,8 @@ variable "api_credentials_secret_name" {
   default     = "api-cron-app-credentials"
 }
 
-variable "splunk_credentials_secret_name" {
-  description = "Name of the AWS Secrets Manager secret containing Splunk credentials"
-  type        = string
-  default     = "api-cron-splunk-credentials"
-}
-
 variable "create_api_secret" {
   description = "Set to true to create the API credentials secret in Secrets Manager. Set to false if it already exists."
-  type        = bool
-  default     = true
-}
-
-variable "create_splunk_secret" {
-  description = "Set to true to create the Splunk credentials secret in Secrets Manager. Set to false if it already exists."
   type        = bool
   default     = true
 }

@@ -17,8 +17,3 @@ output "api_credentials_secret_arn" {
   description = "ARN of the AWS Secrets Manager secret for API credentials"
   value       = local.api_credentials_secret_arn
 }
-
-output "splunk_credentials_secret_arn" {
-  description = "ARN of the AWS Secrets Manager secret for Splunk credentials"
-  value       = local.splunk_credentials_secret_arn
-}

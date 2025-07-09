@@ -39,8 +39,7 @@ resource "aws_iam_policy" "lambda_policy" {
           "secretsmanager:GetSecretValue"
         ]
         Resource = [
-          local.api_credentials_secret_arn,
-          local.splunk_credentials_secret_arn
+          local.api_credentials_secret_arn
         ]
       }
     ]
